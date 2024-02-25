@@ -1,67 +1,74 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-  
+
   const [input, setInput] = useState('');
   const [todos, setTodos] = useState([]);
-
-  function handleInputChange(event)
-  {
+  const [editFlag, setEditFlag] = useState(null);
+  const [editId, setEditId] = useState(null);
+  const [modifiedInput, setMmodifiedInput] = useState('');
+  const [tempTodo, setTempTodo] = useState([]);
+  function handleInputChange(event) {
     setInput(event.target.value);
   }
 
-  function pushTodos()
-  {
-    setTodos([...todos, {id:todos.length, text:input}])
+  function pushTodos() {
+    setTodos([...todos, { id: todos.length, text: input }])
     setInput('')
-    console.log(todos," : ",todos.length);
+    console.log(todos, " : ", todos.length);
   }
 
-  function removeTodo(id)
-  {
-    setTodos(todos.filter(todo=>todo.id!=id))
+  function removeTodo(id) {
+    setTodos(todos.filter(todo => todo.id != id))
   }
 
-  function handleEdit(index){
-    
+  function handleEdit(editData) {
+    console.log(editData);
+    setEditFlag(editData.id)
+    setEditId(editData.id)
+    setMmodifiedInput(editData.text)
   }
+  function modify() {
+    console.log(editId);
 
-        
-  let content = <div>
-    <p>{todo.text}</p>
-  </div>
+    const modTodo = todos.map((todo) => {
+      if (todo.id === editId) {
+        return ({ id: editId, text: modifiedInput })
+      }
+      else {
+        return ({ id: todo.id, text: todo.text })
+      }
 
-
+    })
+    setTodos(modTodo)
+    console.log(modTodo);
+    setEditFlag(null)
+    setMmodifiedInput('')
+  }
+  function handleModifyChange(event) {
+    setMmodifiedInput(event.target.value)
+  }
   return (
     <div>
-
-      <input type="text" onChange={handleInputChange} value={input}/>
-      <button className='btn btn-primary' onClick={pushTodos}>Add</button>
-
-      
-      
-      <ul>
-
-        <li>hello</li>
-
+      <div className="form-inline">
+        <div className="form-group mx-sm-3 mb-2">
+          <input type="text" className="form-control" onChange={handleInputChange} value={input} />
+        </div>
+        <button className='btn btn-primary mb-2' onClick={pushTodos}>Add</button>
+      </div>
+      <ol>
         {
           todos.map((todo, index) => (
-
-
             <li key={index}>
-              
-              {content}
-              <button onClick={() => removeTodo(todo.id)}>Remove</button>
-              <button onClick={handleEdit(index)}>Edit</button>
-              
+              {editFlag == todo.id ? <span><input type="text" onChange={handleModifyChange} value={modifiedInput} /> <button className='btn btn-primary mb-2' onClick={modify}>Modify</button></span> : <span> {todo.text}</span>}&nbsp;&nbsp;
+              <button className="btn btn-outline-danger" onClick={() => removeTodo(todo.id)}>Remove</button>
+              {editFlag==todo.id?<span></span>:<button className="btn btn-outline-warning" onClick={() => handleEdit(todo)}>Edit</button>}
             </li>
           ))
         }
 
-      </ul>
+      </ol>
 
     </div>
   )
